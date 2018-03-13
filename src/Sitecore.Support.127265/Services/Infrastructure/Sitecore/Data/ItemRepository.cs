@@ -52,14 +52,23 @@
       {
         throw new ItemNotFoundException(id.ToString());
       }
+      #region Bug 127265
       if (Settings.RecycleBinActive)
       {
-        item.Recycle();
+        var languageVersions = item.Versions;
+
+        foreach (var languageVersion in languageVersions.GetVersions(false))
+        {
+          languageVersion.RecycleVersion();
+        }
       }
       else
       {
-        item.Delete();
+        var languageVersions = item.Versions;
+
+        languageVersions.RemoveAll(false);
       }
+      #endregion
     }
 
     private static Item FilterItemByVersion(Item item, SitecoreData.Version itemVersion)

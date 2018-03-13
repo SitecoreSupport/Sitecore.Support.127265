@@ -83,20 +83,27 @@
       <HintPath>..\packages\SC.System.Web.Http.8.2.3\lib\System.Web.Http.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.System.Web.Http.WebHost.8.2.3\lib\System.Web.Http.WebHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.System.Web.Mvc.8.2.3\lib\System.Web.Mvc.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\Infrastructure\ConfigurationSettingsBase.cs" />
-    <Compile Include="Services\Infrastructure\Sitecore\ConfigurationSettingsAdapter.cs" />
+    <Compile Include="Services\Infrastructure\Sitecore\Controllers\ItemServiceController.cs" />
     <Compile Include="Services\Infrastructure\Sitecore\Data\ItemRepository.cs" />
-    <Compile Include="Services\Infrastructure\Sitecore\DependencyInjection\ComponentServicesConfigurator.cs" />
     <Compile Include="Services\Infrastructure\Sitecore\DependencyInjection\ServiceLocator.cs" />
     <Compile Include="Services\Infrastructure\Sitecore\Handlers\DeleteItemHandler.cs" />
     <Compile Include="Services\Infrastructure\Sitecore\Handlers\HandlerProvider.cs" />
+    <Compile Include="Services\Infrastructure\Sitecore\Handlers\ItemCommandHandler.cs" />
+    <Compile Include="Services\Infrastructure\Web\Http\DefaultRouteMapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Config\Include\zzz\Sitecore.Support.127265.config" />

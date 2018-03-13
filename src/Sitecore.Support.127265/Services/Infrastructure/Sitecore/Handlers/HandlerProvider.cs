@@ -68,7 +68,7 @@
         new CreateItemHandler(ResolveItemRepository());
 
     private static IItemRequestHandler BuildDeleteItemHandler() =>
-        new DeleteItemHandler(ResolveItemRepository());
+        new global::Sitecore.Support.Services.Infrastructure.Sitecore.Handlers.DeleteItemHandler(ResolveItemRepository());
 
     private static IItemRequestHandler BuildFormatItemSearchResultsHandler() =>
         new FormatItemSearchResultsHandler(ResolveModelFactory());
