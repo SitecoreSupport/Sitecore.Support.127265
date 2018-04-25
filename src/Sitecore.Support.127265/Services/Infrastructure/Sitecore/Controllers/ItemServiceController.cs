@@ -3,6 +3,7 @@ using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Globalization;
 using Sitecore.Services.Infrastructure.Sitecore.Data;
+using Sitecore.Services.Infrastructure.Sitecore.Security;
 using Sitecore.Shell.Framework;
 
 namespace Sitecore.Support.Services.Infrastructure.Sitecore.Controllers
@@ -122,6 +123,8 @@ namespace Sitecore.Support.Services.Infrastructure.Sitecore.Controllers
 
     private T ProcessRequest<T>(Func<HandlerRequest, T> handler, HandlerRequest query)
     {
+      DoAuthorization();
+
       T local;
       try
       {
@@ -280,6 +283,24 @@ namespace Sitecore.Support.Services.Infrastructure.Sitecore.Controllers
       IItemRequestHandler handler = this._handlerProvider.GetHandler<UpdateItemHandler>();
       this.ProcessRequest<object>(new Func<HandlerRequest, object>(handler.Handle), query);
       return new HttpResponseMessage(HttpStatusCode.NoContent);
+    }
+
+    private void DoAuthorization()
+    {
+      bool allowAnonymousUser =
+        System.Convert.ToBoolean(Settings.GetSetting("Sitecore.Services.AllowAnonymousUser", "false"));
+
+      string anonymousUser = Settings.GetSetting("Sitecore.Services.AnonymousUser", string.Empty);
+
+      UserService userService = new UserService();
+
+      if (userService.IsAnonymousUser)
+      {
+        if (allowAnonymousUser && userService.UserExists(anonymousUser))
+        {
+          userService.SwitchToUser(anonymousUser);
+        }
+      }
     }
   }
 }

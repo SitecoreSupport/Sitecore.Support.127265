@@ -24,22 +24,22 @@
     {
       config.Routes.MapHttpRoute("ItemService-QueryViaItem", this._routeBase + "item/{id}/query", new
       {
-        controller = "ItemService",
+        controller = "SupportItemService",
         action = "QueryViaItem"
       }, new { id = @"^(\{{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}{0,1})$" });
       config.Routes.MapHttpRoute("ItemService-Search", this._routeBase + "item/search", new
       {
-        controller = "ItemService",
+        controller = "SupportItemService",
         action = "Search"
       });
       config.Routes.MapHttpRoute("ItemService-SearchViaItem", this._routeBase + "item/{id}/search", new
       {
-        controller = "ItemService",
+        controller = "SupportItemService",
         action = "SearchViaItem"
       }, new { id = @"^(\{{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}{0,1})$" });
       config.Routes.MapHttpRoute("ItemService-Children", this._routeBase + "item/{id}/children", new
       {
-        controller = "ItemService",
+        controller = "SupportItemService",
         action = "GetChildren"
       }, new { id = @"^(\{{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}{0,1})$" });
       config.Routes.MapHttpRoute("ItemService", this._routeBase + "item/{id}", new
@@ -49,10 +49,10 @@
       }, new { id = @"^(\{{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}{0,1})$" });
       config.Routes.MapHttpRoute("ItemService-ContentPath", this._routeBase + "item", new
       {
-        controller = "ItemService",
+        controller = "SupportItemService",
         action = "GetItemByContentPath"
       });
-      config.Routes.MapHttpRoute("ItemService-Path", this._routeBase + "item/{*path}", new { controller = "ItemService" });
+      config.Routes.MapHttpRoute("ItemService-Path", this._routeBase + "item/{*path}", new { controller = "SupportItemService" });
       config.Routes.MapHttpRoute("EntityService", this._routeBase + "{namespace}/{controller}/{id}/{action}", new
       {
         id = RouteParameter.Optional,
