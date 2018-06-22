@@ -1,4 +1,7 @@
-﻿namespace Sitecore.Support.Services.Infrastructure.Sitecore.Data
+﻿using Sitecore.Services.Infrastructure.Sitecore.Security;
+using Sitecore.StringExtensions;
+
+namespace Sitecore.Support.Services.Infrastructure.Sitecore.Data
 {
   using System;
   using System.Collections.Generic;
@@ -18,11 +21,14 @@
 
     public ItemRepository(ILogger logger)
     {
+      DoAuthorization();
       this._logger = logger;
     }
 
     public Guid Add(ItemCreateRequest request, string databaseName, string language)
     {
+      DoAuthorization();
+
       SitecoreData.Database database = GetDatabase(databaseName);
       Language language2 = ItemDataBase.GetLanguage(language);
       Item item = database.GetItem(request.ParentPath, language2);
@@ -45,9 +51,22 @@
 
     public void Delete(Guid id, string databaseName, string language)
     {
+      DoAuthorization();
+
       SitecoreData.Database database = GetDatabase(databaseName);
-      Language language2 = ItemDataBase.GetLanguage(language);
-      Item item = database.GetItem(new SitecoreData.ID(id), language2);
+
+      Item item;
+
+      if (language.IsNullOrEmpty())
+      {
+        item = database.GetItem(new SitecoreData.ID(id));
+      }
+      else
+      {
+        Language language2 = ItemDataBase.GetLanguage(language);
+        item = database.GetItem(new SitecoreData.ID(id), language2);
+      }
+
       if (item == null)
       {
         throw new ItemNotFoundException(id.ToString());
@@ -55,18 +74,32 @@
       #region Bug 127265
       if (Settings.RecycleBinActive)
       {
-        var languageVersions = item.Versions;
-
-        foreach (var languageVersion in languageVersions.GetVersions(false))
+        if (language.IsNullOrEmpty())
         {
-          languageVersion.RecycleVersion();
+          item.Recycle();
+        }
+        else
+        {
+          var languageVersions = item.Versions;
+
+          foreach (var languageVersion in languageVersions.GetVersions(false))
+          {
+            languageVersion.RecycleVersion();
+          }
         }
       }
       else
       {
-        var languageVersions = item.Versions;
+        if (language.IsNullOrEmpty())
+        {
+          item.Delete();
+        }
+        else
+        {
+          var languageVersions = item.Versions;
 
-        languageVersions.RemoveAll(false);
+          languageVersions.RemoveAll(false);
+        }
       }
       #endregion
     }
@@ -86,6 +119,8 @@
 
     public Item FindById(Guid id, string databaseName, string language, string version)
     {
+      DoAuthorization();
+
       SitecoreData.Database database = GetDatabase(databaseName);
       Language language2 = ItemDataBase.GetLanguage(language);
       SitecoreData.Version itemVersion = this.GetItemVersion(version);
@@ -94,6 +129,8 @@
 
     public Item FindByPath(string path, string databaseName, string language, string version)
     {
+      DoAuthorization();
+
       SitecoreData.Database database = GetDatabase(databaseName);
       Language language2 = ItemDataBase.GetLanguage(language);
       SitecoreData.Version itemVersion = this.GetItemVersion(version);
@@ -121,6 +158,8 @@
 
     private SitecoreData.Version GetItemVersion(string versionNumber)
     {
+      DoAuthorization();
+
       SitecoreData.Version version;
       if (!string.IsNullOrEmpty(versionNumber) && (SitecoreData.Version.TryParse(versionNumber, out version) && (version.Number > 0)))
       {
@@ -143,6 +182,8 @@
 
     public void Update(ItemUpdateRequest request, string databaseName, string language, string version)
     {
+      DoAuthorization();
+
       SitecoreData.Database database = GetDatabase(databaseName);
       Language language2 = ItemDataBase.GetLanguage(language);
       SitecoreData.Version itemVersion = this.GetItemVersion(version);
@@ -167,6 +208,8 @@
 
     private void UpdateFields(FieldDictionary fields, Item itemToUpdate)
     {
+      DoAuthorization();
+
       foreach (KeyValuePair<string, object> pair in fields)
       {
         if (itemToUpdate.Fields[pair.Key] == null)
@@ -176,6 +219,24 @@
         else
         {
           itemToUpdate.Fields[pair.Key].Value = (string)pair.Value;
+        }
+      }
+    }
+
+    private void DoAuthorization()
+    {
+      bool allowAnonymousUser =
+        System.Convert.ToBoolean(Settings.GetSetting("Sitecore.Services.AllowAnonymousUser", "false"));
+
+      string anonymousUser = Settings.GetSetting("Sitecore.Services.AnonymousUser", string.Empty);
+
+      UserService userService = new UserService();
+
+      if (userService.IsAnonymousUser)
+      {
+        if (allowAnonymousUser && userService.UserExists(anonymousUser))
+        {
+          userService.SwitchToUser(anonymousUser);
         }
       }
     }
